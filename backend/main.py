@@ -8,7 +8,8 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-origins = ["http://localhost:3000", "http://127.0.0.1:5000", "*"]
+# You can define specific origins or use "*" to allow all
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -20,8 +21,10 @@ app.add_middleware(
 
 def get_db():
     db = SessionLocal()
-    try: yield db
-    finally: db.close()
+    try:
+        yield db
+    finally:
+        db.close()
 
 # Customer Routes
 @app.get("/customers", response_model=list[schemas.Customer])

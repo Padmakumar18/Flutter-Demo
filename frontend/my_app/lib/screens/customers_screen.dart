@@ -1,7 +1,7 @@
 // Directory: frontend/lib/screens/customers_screen.dart
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
-import '../widgets/customer_form.dart';
+import '../screens/customer_form.dart';
 
 class CustomersScreen extends StatefulWidget {
   const CustomersScreen({super.key});

@@ -1,7 +1,7 @@
 // Directory: frontend/lib/screens/products_screen.dart
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
-import '../widgets/product_form.dart';
+import '../screens/product_form.dart';
 
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
