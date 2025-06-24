@@ -8,29 +8,36 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Home")),
-      body: Center(
+      appBar: AppBar(title: const Text("Home")),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start, // Align to left
           children: [
-            ElevatedButton(
+            TextButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => CustomersScreen()),
+                  MaterialPageRoute(builder: (_) => const CustomersScreen()),
                 );
               },
-              child: Text("Customers"),
+              child: const Text(
+                "Customers",
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              ),
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
+            const Divider(thickness: 1),
+            TextButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => ProductsScreen()),
+                  MaterialPageRoute(builder: (_) => const ProductsScreen()),
                 );
               },
-              child: Text("Products"),
+              child: const Text(
+                "Products",
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              ),
             ),
           ],
         ),

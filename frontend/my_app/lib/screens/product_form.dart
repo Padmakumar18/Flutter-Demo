@@ -1,11 +1,17 @@
-// Directory: frontend/lib/widgets/product_form.dart
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 
 class ProductForm extends StatefulWidget {
   final Map<String, dynamic>? product;
+  final VoidCallback onSave;
+  final VoidCallback onCancel;
 
-  const ProductForm({super.key, this.product});
+  const ProductForm({
+    super.key,
+    this.product,
+    required this.onSave,
+    required this.onCancel,
+  });
 
   @override
   _ProductFormState createState() => _ProductFormState();
@@ -30,10 +36,12 @@ class _ProductFormState extends State<ProductForm> {
     quantityController = TextEditingController(
       text: widget.product?['quantity']?.toString() ?? '',
     );
-    dateController = TextEditingController(text: widget.product?['date'] ?? '');
+    dateController = TextEditingController(
+      text: widget.product?['date']?.toString() ?? '',
+    );
   }
 
-  void saveProduct() async {
+  void save() async {
     if (_formKey.currentState!.validate()) {
       final product = {
         "food_name": nameController.text,
@@ -42,48 +50,57 @@ class _ProductFormState extends State<ProductForm> {
         "date": dateController.text,
       };
       await ApiService.saveProduct(product, id: widget.product?['id']);
-      Navigator.pop(context);
+      widget.onSave();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.product != null ? "Edit Product" : "Add Product"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: nameController,
-                decoration: InputDecoration(labelText: "Food Name"),
-                validator: (value) => value!.isEmpty ? "Required" : null,
-              ),
-              TextFormField(
-                controller: priceController,
-                decoration: InputDecoration(labelText: "Price"),
-                keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? "Required" : null,
-              ),
-              TextFormField(
-                controller: quantityController,
-                decoration: InputDecoration(labelText: "Quantity"),
-                keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? "Required" : null,
-              ),
-              TextFormField(
-                controller: dateController,
-                decoration: InputDecoration(labelText: "Date (YYYY-MM-DD)"),
-                validator: (value) => value!.isEmpty ? "Required" : null,
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(onPressed: saveProduct, child: Text("Save")),
-            ],
-          ),
+    return Form(
+      key: _formKey,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              widget.product != null ? "Edit Product" : "Add Product",
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 8),
+            TextFormField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: "Food Name"),
+              validator: (value) => value!.isEmpty ? "Required" : null,
+            ),
+            TextFormField(
+              controller: priceController,
+              decoration: const InputDecoration(labelText: "Price"),
+              keyboardType: TextInputType.number,
+              validator: (value) => value!.isEmpty ? "Required" : null,
+            ),
+            TextFormField(
+              controller: quantityController,
+              decoration: const InputDecoration(labelText: "Quantity"),
+              keyboardType: TextInputType.number,
+              validator: (value) => value!.isEmpty ? "Required" : null,
+            ),
+            TextFormField(
+              controller: dateController,
+              decoration: const InputDecoration(labelText: "Date (YYYY-MM-DD)"),
+              validator: (value) => value!.isEmpty ? "Required" : null,
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: widget.onCancel,
+                  child: const Text("Cancel"),
+                ),
+                ElevatedButton(onPressed: save, child: const Text("Save")),
+              ],
+            ),
+          ],
         ),
       ),
     );

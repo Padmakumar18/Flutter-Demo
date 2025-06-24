@@ -1,4 +1,3 @@
-// Directory: frontend/lib/screens/customers_screen.dart
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../screens/customer_form.dart';
@@ -31,50 +30,75 @@ class _CustomersScreenState extends State<CustomersScreen> {
     fetchCustomers();
   }
 
+  Future<void> showCustomerForm({Map<String, dynamic>? customer}) async {
+    await showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: CustomerForm(
+            customer: customer,
+            onSave: () {
+              Navigator.pop(context);
+              fetchCustomers();
+            },
+            onCancel: () => Navigator.pop(context),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Customers")),
-      body: ListView.builder(
-        itemCount: customers.length,
-        itemBuilder: (context, index) {
-          final customer = customers[index];
-          return ListTile(
-            title: Text(customer['customer_name'] ?? ''),
-            subtitle: Text(customer['email_address'] ?? ''),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CustomerForm(customer: customer),
+      appBar: AppBar(title: const Text("Customers")),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DataTable(
+          columns: const [
+            DataColumn(label: Text("ID")),
+            DataColumn(label: Text("Name")),
+            DataColumn(label: Text("Phone")),
+            DataColumn(label: Text("Address")),
+            DataColumn(label: Text("Email")),
+            DataColumn(label: Text("Age")),
+            DataColumn(label: Text("Actions")),
+          ],
+          rows: customers
+              .map(
+                (customer) => DataRow(
+                  cells: [
+                    DataCell(Text(customer['id'].toString())),
+                    DataCell(Text(customer['customer_name'] ?? '')),
+                    DataCell(Text(customer['phone_number'] ?? '')),
+                    DataCell(Text(customer['address'] ?? '')),
+                    DataCell(Text(customer['email_address'] ?? '')),
+                    DataCell(Text(customer['age'].toString())),
+                    DataCell(
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.blue),
+                            onPressed: () =>
+                                showCustomerForm(customer: customer),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => deleteCustomer(customer['id']),
+                          ),
+                        ],
                       ),
-                    );
-                    fetchCustomers();
-                  },
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () => deleteCustomer(customer['id']),
-                ),
-              ],
-            ),
-          );
-        },
+              )
+              .toList(),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => CustomerForm()),
-          );
-          fetchCustomers();
-        },
-        child: Icon(Icons.add),
+        onPressed: () => showCustomerForm(),
+        child: const Icon(Icons.add),
       ),
     );
   }

@@ -1,11 +1,17 @@
-// Directory: frontend/lib/widgets/customer_form.dart
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 
 class CustomerForm extends StatefulWidget {
   final Map<String, dynamic>? customer;
+  final VoidCallback onSave;
+  final VoidCallback onCancel;
 
-  const CustomerForm({super.key, this.customer});
+  const CustomerForm({
+    super.key,
+    this.customer,
+    required this.onSave,
+    required this.onCancel,
+  });
 
   @override
   _CustomerFormState createState() => _CustomerFormState();
@@ -39,7 +45,7 @@ class _CustomerFormState extends State<CustomerForm> {
     );
   }
 
-  void saveCustomer() async {
+  void save() async {
     if (_formKey.currentState!.validate()) {
       final customer = {
         "customer_name": nameController.text,
@@ -49,52 +55,61 @@ class _CustomerFormState extends State<CustomerForm> {
         "age": int.parse(ageController.text),
       };
       await ApiService.saveCustomer(customer, id: widget.customer?['id']);
-      Navigator.pop(context);
+      widget.onSave();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.customer != null ? "Edit Customer" : "Add Customer"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: nameController,
-                decoration: InputDecoration(labelText: "Name"),
-                validator: (value) => value!.isEmpty ? "Required" : null,
-              ),
-              TextFormField(
-                controller: phoneController,
-                decoration: InputDecoration(labelText: "Phone"),
-                validator: (value) => value!.isEmpty ? "Required" : null,
-              ),
-              TextFormField(
-                controller: addressController,
-                decoration: InputDecoration(labelText: "Address"),
-                validator: (value) => value!.isEmpty ? "Required" : null,
-              ),
-              TextFormField(
-                controller: emailController,
-                decoration: InputDecoration(labelText: "Email"),
-                validator: (value) => value!.isEmpty ? "Required" : null,
-              ),
-              TextFormField(
-                controller: ageController,
-                decoration: InputDecoration(labelText: "Age"),
-                keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? "Required" : null,
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(onPressed: saveCustomer, child: Text("Save")),
-            ],
-          ),
+    return Form(
+      key: _formKey,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              widget.customer != null ? "Edit Customer" : "Add Customer",
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 8),
+            TextFormField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: "Name"),
+              validator: (value) => value!.isEmpty ? "Required" : null,
+            ),
+            TextFormField(
+              controller: phoneController,
+              decoration: const InputDecoration(labelText: "Phone"),
+              validator: (value) => value!.isEmpty ? "Required" : null,
+            ),
+            TextFormField(
+              controller: addressController,
+              decoration: const InputDecoration(labelText: "Address"),
+              validator: (value) => value!.isEmpty ? "Required" : null,
+            ),
+            TextFormField(
+              controller: emailController,
+              decoration: const InputDecoration(labelText: "Email"),
+              validator: (value) => value!.isEmpty ? "Required" : null,
+            ),
+            TextFormField(
+              controller: ageController,
+              decoration: const InputDecoration(labelText: "Age"),
+              keyboardType: TextInputType.number,
+              validator: (value) => value!.isEmpty ? "Required" : null,
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: widget.onCancel,
+                  child: const Text("Cancel"),
+                ),
+                ElevatedButton(onPressed: save, child: const Text("Save")),
+              ],
+            ),
+          ],
         ),
       ),
     );

@@ -1,4 +1,3 @@
-// Directory: frontend/lib/screens/products_screen.dart
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../screens/product_form.dart';
@@ -31,50 +30,72 @@ class _ProductsScreenState extends State<ProductsScreen> {
     fetchProducts();
   }
 
+  Future<void> showProductForm({Map<String, dynamic>? product}) async {
+    await showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: ProductForm(
+            product: product,
+            onSave: () {
+              Navigator.pop(context);
+              fetchProducts();
+            },
+            onCancel: () => Navigator.pop(context),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Products")),
-      body: ListView.builder(
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          final product = products[index];
-          return ListTile(
-            title: Text(product['food_name'] ?? ''),
-            subtitle: Text("₹ ${product['price'].toString()}"),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ProductForm(product: product),
+      appBar: AppBar(title: const Text("Products")),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DataTable(
+          columns: const [
+            DataColumn(label: Text("ID")),
+            DataColumn(label: Text("Name")),
+            DataColumn(label: Text("Price")),
+            DataColumn(label: Text("Quantity")),
+            DataColumn(label: Text("Date")),
+            DataColumn(label: Text("Actions")),
+          ],
+          rows: products
+              .map(
+                (product) => DataRow(
+                  cells: [
+                    DataCell(Text(product['id'].toString())),
+                    DataCell(Text(product['food_name'] ?? '')),
+                    DataCell(Text(product['price'].toString())),
+                    DataCell(Text(product['quantity'].toString())),
+                    DataCell(Text(product['date'].toString())),
+                    DataCell(
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.blue),
+                            onPressed: () => showProductForm(product: product),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => deleteProduct(product['id']),
+                          ),
+                        ],
                       ),
-                    );
-                    fetchProducts();
-                  },
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () => deleteProduct(product['id']),
-                ),
-              ],
-            ),
-          );
-        },
+              )
+              .toList(),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => ProductForm()),
-          );
-          fetchProducts();
-        },
-        child: Icon(Icons.add),
+        onPressed: () => showProductForm(),
+        child: const Icon(Icons.add),
       ),
     );
   }
