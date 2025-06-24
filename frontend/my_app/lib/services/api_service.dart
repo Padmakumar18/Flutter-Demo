@@ -18,8 +18,9 @@ class ApiService {
   static Future<void> deleteCustomer(int id) async {
     final response = await http.delete(Uri.parse("$baseUrl/customers/$id"));
     print("DELETE Customer -> ${response.statusCode}");
-    if (response.statusCode != 200)
+    if (response.statusCode != 200) {
       throw Exception("Failed to delete customer");
+    }
   }
 
   static Future<void> saveCustomer(
@@ -67,8 +68,6 @@ class ApiService {
     int? id,
   }) async {
     final url = id != null ? "$baseUrl/products/$id" : "$baseUrl/products";
-
-    // 👇 Fix date format to YYYY-MM-DD (important for FastAPI compatibility)
     if (product.containsKey("date") && product["date"] is DateTime) {
       product["date"] = (product["date"] as DateTime)
           .toIso8601String()
